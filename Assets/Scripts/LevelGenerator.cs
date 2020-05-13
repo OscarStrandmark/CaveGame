@@ -115,6 +115,7 @@ public class LevelGenerator : MonoBehaviour
 
         //-----------------------------------------------------------------
 
+        //Place important pieces on pathMatrix
         pathMatrix[0, entrance_X] = true;
 
         pathMatrix[0, connectRow01_x] = true;
@@ -128,6 +129,7 @@ public class LevelGenerator : MonoBehaviour
 
         pathMatrix[3, exit_x] = true;
 
+        //Fill chunks between important pieces in pathMatrix
         if((Math.Abs((entrance_X + 1) -(connectRow01_x + 1))) > 1) //Row 0
         {
             if(entrance_X > connectRow01_x)
@@ -231,7 +233,7 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int col = 0; col < 4; col++)
             {
-                if (pathMatrix[row, col] == false)
+                if (!pathMatrix[row, col])
                 {
                     chunkMatrix[row, col] = getRandomFillChunk();
                 }
@@ -259,42 +261,49 @@ public class LevelGenerator : MonoBehaviour
         conn = checkSides(0, entrance_X, pathMatrix);
         if(conn == LEFT ) { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, true, false, true, false); }
         if(conn == RIGHT) { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, false, true, true, false); }
+        if(conn == BOTH)  { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, true, true, true, false); }
 
         //Set dropdown from row 0 to row 1
         conn = checkSides(0, connectRow01_x, pathMatrix);
         if(conn == LEFT ) { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, true, false, false, false); }
         if(conn == RIGHT) { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, false, true, false, false); }
+        if(conn == BOTH)  { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, true, true, false, false); }
 
         //Set drop from row 0 to row 1
         conn = checkSides(1, connectRow01_x, pathMatrix);
         if(conn == LEFT ) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, true, false, false, false);}
         if(conn == RIGHT) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, false, true, false, false);}
+        if(conn == BOTH) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, true, true, false, false); }
 
         //Set dropdown from row 1 from row 2
         conn = checkSides(1,connectRow12_x,pathMatrix);
         if(conn == LEFT ) { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, true, false, false, false);}
         if(conn == RIGHT) { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, false, true, false, false);}
+        if(conn == BOTH)  { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, true, true, false, false); }
 
         //Set drop from row 1 to row 2
         conn = checkSides(2, connectRow12_x, pathMatrix);
-        if(conn == LEFT ) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(false, false, false, false, false, false);}
-        if(conn == RIGHT) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(false, false, false, false, false, false);}
-
+        if(conn == LEFT ) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, true, false, false, false);}
+        if(conn == RIGHT) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, false, true, false, false);}
+        if(conn == BOTH)  { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, true, true, false, false); }
 
         //Set dropdown from row 2 from row 3
         conn = checkSides(2, connectRow23_x, pathMatrix);
-        if (conn == LEFT) { chunkMatrix[1, connectRow23_x] = getChunkWithRequirements(false, true, true, false, false, false); }
-        if (conn == RIGHT) { chunkMatrix[1, connectRow23_x] = getChunkWithRequirements(false, true, false, true, false, false); }
+        if (conn == LEFT) { chunkMatrix[2, connectRow23_x] = getChunkWithRequirements(false, true, true, false, false, false); }
+        if (conn == RIGHT) { chunkMatrix[2, connectRow23_x] = getChunkWithRequirements(false, true, false, true, false, false); }
+        if (conn == BOTH) { chunkMatrix[2, connectRow23_x] = getChunkWithRequirements(false, true, true, true, false, false); }
 
         //Set drop from row 2 to row 3
         conn = checkSides(3, connectRow23_x, pathMatrix);
-        if (conn == LEFT) { chunkMatrix[2, connectRow23_x] = getChunkWithRequirements(false, false, false, false, false, false); }
-        if (conn == RIGHT) { chunkMatrix[2, connectRow23_x] = getChunkWithRequirements(false, false, false, false, false, false); }
+        if (conn == LEFT) { chunkMatrix[3, connectRow23_x] = getChunkWithRequirements(true, false, true, false, false, false); }
+        if (conn == RIGHT) { chunkMatrix[3, connectRow23_x] = getChunkWithRequirements(true, false, false, true, false, false); }
+        if (conn == BOTH) { chunkMatrix[3, connectRow23_x] = getChunkWithRequirements(true, false, true, true, false, false); }
 
         //Set exit
         conn = checkSides(3, exit_x, pathMatrix);
         if (conn == LEFT) { chunkMatrix[3, exit_x] = getChunkWithRequirements(false, false, true, false, false, true); }
         if (conn == RIGHT) { chunkMatrix[3, exit_x] = getChunkWithRequirements(false, false, false, true, false, true); }
+        if (conn == BOTH) { chunkMatrix[3, exit_x] = getChunkWithRequirements(false, false, true, true, false, true); }
 
         //DEBUG
         bool[,] tilesPlaced = new bool[40, 40];
@@ -305,6 +314,9 @@ public class LevelGenerator : MonoBehaviour
                 tilesPlaced[row, col] = false;
             }
         }
+
+        int entrancesCount = 0;
+        int exitsCount     = 0;
 
         //Now for placing out all 1600 tiles, one chunk at a time
         for (int row = 0; row < 4; row++)
@@ -326,6 +338,9 @@ public class LevelGenerator : MonoBehaviour
 
                         switch (tileVal)
                         {
+                            case '0':
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), null); //Remove tile - set it as an "air" tile
+                                break;
                             case '1': //Rock
                                 tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),rockTile);
                                 break;
@@ -343,10 +358,12 @@ public class LevelGenerator : MonoBehaviour
                                 entranceX = finalCol;
                                 entranceY = -finalRow;
                                 GameObject playerCharacter = GameObject.FindWithTag("Player");
-                                playerCharacter.transform.position = new Vector3(entranceX, entranceY);
+                                playerCharacter.transform.position = new Vector3(entranceX-1, entranceY-1);
+                                entrancesCount++;
                                 break;
                             case '6': //Exit
                                 tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),exitTile);
+                                exitsCount++;
                                 break;
                         }
                         //Debug.Log("Placed block at: (" + finalCol + "," + finalRow + ")");
@@ -354,6 +371,9 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
+
+        if(entrancesCount > 1) { Debug.LogError("Too many entrances! Placed " + entrancesCount); }
+        if(exitsCount > 1) { Debug.LogError("Too many exits! Placed " + exitsCount); }
 
         int count = 0;
 
