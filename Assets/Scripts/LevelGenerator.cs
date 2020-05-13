@@ -60,6 +60,8 @@ public class LevelGenerator : MonoBehaviour
     private static readonly int ENTRANCE       = 5;
     private static readonly int EXIT           = 6;
 
+    private int entranceX;
+    private int entranceY;
 
     void Start()
     {
@@ -76,7 +78,7 @@ public class LevelGenerator : MonoBehaviour
         arrowtrapRightTile = tilemap.GetTile(new Vector3Int(-27, 36, 0));
 
         //Place border of indestructible rock
-        for (int x = -1; x <= 41; x++)
+        for (int x = -1; x <= 40; x++)
         {
             tilemap.SetTile(new Vector3Int(x, 1, 0), rockHardTile);  //Top wall
             tilemap.SetTile(new Vector3Int(x, -40, 0), rockHardTile);//Bottom wall
@@ -84,7 +86,7 @@ public class LevelGenerator : MonoBehaviour
         for (int y = 1; y >= -40; y--)
         {
             tilemap.SetTile(new Vector3Int(-1, y, 0), rockHardTile); //Left wall
-            tilemap.SetTile(new Vector3Int(41, y, 0), rockHardTile); //Right wall
+            tilemap.SetTile(new Vector3Int(40, y, 0), rockHardTile); //Right wall
         }
 
         //Load all chunks into memory from files.
@@ -221,7 +223,7 @@ public class LevelGenerator : MonoBehaviour
         //-----------------------------------------------------------------
 
         //Now a critical path through the map has been decided on, now translate that path to chunks and create the map
-
+        //
         chunkMatrix = new Chunk[4, 4]; //Create a matrix to store what chunk needs to be put where
 
         //Fill chunks not on vital path with random chunks.
@@ -235,6 +237,19 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
+
+        for (int row = 0; row < 4; row++)
+        {
+            for (int col = 0; col < 4; col++)
+            {
+                if (pathMatrix[row, col])
+                {
+                    chunkMatrix[row, col] = getChunkWithRequirements(false, false, true, true, false, false);
+                }
+            }
+        }
+
+        //-----------------------------------------------------------------
 
         int conn; //Var for storing the result of checking sides. 
 
@@ -281,10 +296,20 @@ public class LevelGenerator : MonoBehaviour
         if (conn == LEFT) { chunkMatrix[3, exit_x] = getChunkWithRequirements(false, false, true, false, false, true); }
         if (conn == RIGHT) { chunkMatrix[3, exit_x] = getChunkWithRequirements(false, false, false, true, false, true); }
 
+        //DEBUG
+        bool[,] tilesPlaced = new bool[40, 40];
+        for (int row = 0; row < 40; row++)
+        {
+            for (int col = 0; col < 40; col++)
+            {
+                tilesPlaced[row, col] = false;
+            }
+        }
+
         //Now for placing out all 1600 tiles, one chunk at a time
         for (int row = 0; row < 4; row++)
         {
-            for (int col = 0; col > -4; col--)
+            for (int col = 0; col < 4; col++)
             {
                 Chunk currentChunk = chunkMatrix[row, col];
                 int[,] tileMatrix = currentChunk.getChunkMatrix();
@@ -297,32 +322,49 @@ public class LevelGenerator : MonoBehaviour
                         int finalCol = (col*10) + chunkCol;
                         int tileVal = tileMatrix[chunkRow, chunkCol];
 
+                        tilesPlaced[finalRow, finalCol] = true;
+
                         switch (tileVal)
                         {
-                            case 1: //Rock
-                                tilemap.SetTile(new Vector3Int(finalCol, finalRow, 0),rockTile);
+                            case '1': //Rock
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),rockTile);
                                 break;
-                            case 2: //Spikes
-                                tilemap.SetTile(new Vector3Int(finalCol, finalRow, 0),spikeTile);
+                            case '2': //Spikes
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),spikeTile);
                                 break;
-                            case 3: //ArrowtrapLeft
-                                tilemap.SetTile(new Vector3Int(finalCol, finalRow, 0),arrowtrapLeftTile);
+                            case '3': //ArrowtrapLeft
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),arrowtrapLeftTile);
                                 break;
-                            case 4: //ArrowtrapRight
-                                tilemap.SetTile(new Vector3Int(finalCol, finalRow, 0),arrowtrapRightTile);
+                            case '4': //ArrowtrapRight
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),arrowtrapRightTile);
                                 break;
-                            case 5: //Entrance
-                                tilemap.SetTile(new Vector3Int(finalCol, finalRow, 0),entranceTile);
+                            case '5': //Entrance
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),entranceTile);
+                                entranceX = finalCol;
+                                entranceY = -finalRow;
+                                GameObject playerCharacter = GameObject.FindWithTag("Player");
+                                playerCharacter.transform.position = new Vector3(entranceX, entranceY);
                                 break;
-                            case 6: //Exit
-                                tilemap.SetTile(new Vector3Int(finalCol, finalRow, 0),exitTile);
+                            case '6': //Exit
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),exitTile);
                                 break;
                         }
+                        //Debug.Log("Placed block at: (" + finalCol + "," + finalRow + ")");
                     }
                 }
             }
         }
 
+        int count = 0;
+
+        for (int row = 0; row < 40; row++)
+        {
+            for (int col = 0; col < 40; col++)
+            {
+                if(tilesPlaced[row, col]) { count++; }
+            }
+        }
+        Debug.Log("Tiles placed: " + count);
     }
 
 
@@ -334,27 +376,28 @@ public class LevelGenerator : MonoBehaviour
             //Read files and set chunk properties
             string data = File.ReadAllText(file);
             Chunk chunk = new Chunk(data);
-            if (file[15] == '1') //Up
+            string boolstring = "" + file[14] + file[15] + file[16] + file[17] + file[18] + file[19];
+            if (boolstring[0] == '1') //Up
             {
                 chunk.up = true;
             }
-            if (file[16] == '1') //Down
+            if (boolstring[1] == '1') //Down
             {
                 chunk.down = true;
             }
-            if (file[17] == '1') //Left
+            if (boolstring[2] == '1') //Left
             {
                 chunk.left = true;
             }
-            if (file[18] == '1') //Right
+            if (boolstring[3] == '1') //Right
             {
                 chunk.right = true;
             }
-            if (file[19] == '1') //Entrance
+            if (boolstring[4] == '1') //Entrance
             {
                 chunk.entrance = true;
             }
-            if (file[20] == '1') //Exit
+            if (boolstring[5] == '1') //Exit
             {
                 chunk.exit = true;
             }
@@ -391,6 +434,10 @@ public class LevelGenerator : MonoBehaviour
             if (requireEntrance) { if (c.entrance) { flagCount++; } }
             if (requireExit) { if (c.exit) { flagCount++; } }
 
+            //Do not allow chunks containing entrance or exit tiles unless specified, we only want 1 entrance and exit per level.
+            if(!requireEntrance && c.entrance) { flagCount = 0; }
+            if(!requireExit && c.exit) { flagCount = 0; }
+
             if(flagCount == reqSum)
             {
                 goodChunks.Add(c);
@@ -413,8 +460,8 @@ public class LevelGenerator : MonoBehaviour
         {
             int index = rand.Next(0, goodChunks.Count);
 
-            Debug.Log("Amount of good chunks found: " + goodChunks.Count);
-            Debug.Log("Index chosen: " + index);
+            //Debug.Log("Amount of good chunks found: " + goodChunks.Count);
+            //Debug.Log("Index chosen: " + index);
 
             return goodChunks[index];
         }

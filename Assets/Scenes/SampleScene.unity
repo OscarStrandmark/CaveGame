@@ -155,7 +155,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 08a8168a4abe45742a58e59c9ba5af00, type: 3}
@@ -391,33 +391,6 @@ Tilemap:
   m_GameObject: {fileID: 765564624}
   m_Enabled: 1
   m_Tiles:
-  - first: {x: 2, y: -3, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 2147483649
-  - first: {x: 3, y: -3, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 2147483649
-  - first: {x: 4, y: -3, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 2
-      m_TileSpriteIndex: 2
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      m_AllTileFlags: 2147483649
   - first: {x: -33, y: 36, z: 0}
     second:
       serializedVersion: 2
@@ -487,7 +460,7 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: 8c5175dcd23a5fa458bdcc65c9ada5c9, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 4bbeb1e2017e6524081089bd79996103, type: 2}
-  - m_RefCount: 4
+  - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 0337086cb39436b4e964d51e2260bc3b, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 88a9f938351989347b1ff58b10ac9a45, type: 2}
@@ -504,7 +477,7 @@ Tilemap:
   - m_RefCount: 1
     m_Data: {fileID: -3273658165334818701, guid: c97373f3a7d4f034d84b58da797d150d,
       type: 3}
-  - m_RefCount: 4
+  - m_RefCount: 1
     m_Data: {fileID: 2410906495130195657, guid: c97373f3a7d4f034d84b58da797d150d,
       type: 3}
   - m_RefCount: 1
@@ -516,7 +489,7 @@ Tilemap:
     m_Data: {fileID: 4069068877378456375, guid: c97373f3a7d4f034d84b58da797d150d,
       type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 10
+  - m_RefCount: 7
     m_Data:
       e00: 1
       e01: 0
@@ -535,7 +508,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 10
+  - m_RefCount: 7
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
