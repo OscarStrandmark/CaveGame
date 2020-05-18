@@ -115,7 +115,7 @@ MonoBehaviour:
   m_MinSize: {x: 677, y: 492}
   m_MaxSize: {x: 14001, y: 14042}
   vertical: 0
-  controlID: 107
+  controlID: 62
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -393,9 +393,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      m_SelectedIDs: 724a0000
       m_LastClickedID: 0
-      m_ExpandedIDs: 6afbffffc2380000
+      m_ExpandedIDs: 6afbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -455,9 +455,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 23.97027, y: -21.226059, z: -169.09375}
+    m_Target: {x: 20.587852, y: -28.073458, z: -171.17522}
     speed: 2
-    m_Value: {x: 23.97027, y: -21.226059, z: -169.09375}
+    m_Value: {x: 20.643684, y: -27.345953, z: -170.99387}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -507,9 +507,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 42.693752
+    m_Target: 42.092228
     speed: 2
-    m_Value: 40.855267
+    m_Value: 40.279644
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -573,19 +573,19 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/TextureMaps
+    - Assets/Chunks
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/TextureMaps
+  - Assets/Chunks
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\dev\git\CaveGame
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 42390000
-    m_LastClickedID: 14658
+    m_SelectedIDs: 34390000
+    m_LastClickedID: 14644
     m_ExpandedIDs: 000000002639000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -666,7 +666,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 0}
+    m_ScrollPosition: {x: 0, y: 759}
     m_GridSize: 64
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 292
