@@ -42,6 +42,8 @@ public class LevelGenerator : MonoBehaviour
 
     private Chunk[,] chunkMatrix;
 
+    private System.Random random;
+
     //Tiles
     private TileBase rockTile;
     private TileBase rockHardTile;
@@ -65,6 +67,9 @@ public class LevelGenerator : MonoBehaviour
 
     void Start()
     {
+
+        random = new System.Random();
+
         //Get tilemap
         tilemap = GetComponent<Tilemap>();
 
@@ -92,8 +97,6 @@ public class LevelGenerator : MonoBehaviour
         //Load all chunks into memory from files.
         readChunks();
 
-        System.Random random = new System.Random();
-
         //Matrix for marking critical path. 
         bool[,] pathMatrix = new bool[4, 4];
         for (int row = 0; row < 4; row++)
@@ -109,7 +112,9 @@ public class LevelGenerator : MonoBehaviour
         int connectRow01_x = entrance_X;
         while(connectRow01_x == entrance_X) { connectRow01_x = random.Next(0, 4); }
         int connectRow12_x = random.Next(0, 4);
+        while(connectRow12_x == connectRow01_x) { connectRow12_x = random.Next(0, 4); }
         int connectRow23_x = random.Next(0, 4);
+        while (connectRow12_x == connectRow23_x) { connectRow23_x = random.Next(0, 4); }
         int exit_x = connectRow23_x;
         while (exit_x == connectRow23_x) { exit_x = random.Next(0, 4); }
 
@@ -430,7 +435,6 @@ public class LevelGenerator : MonoBehaviour
 
     private Chunk getChunkWithRequirements(bool requireUp, bool requireDown, bool requireLeft, bool requireRight, bool requireEntrance, bool requireExit)
     {
-        System.Random rand = new System.Random();
         List<Chunk> goodChunks = new List<Chunk>();
 
         //Count amount of flags needed
@@ -478,7 +482,7 @@ public class LevelGenerator : MonoBehaviour
         }
         else
         {
-            int index = rand.Next(0, goodChunks.Count);
+            int index = random.Next(0, goodChunks.Count);
 
             //Debug.Log("Amount of good chunks found: " + goodChunks.Count);
             //Debug.Log("Index chosen: " + index);
@@ -489,11 +493,10 @@ public class LevelGenerator : MonoBehaviour
 
     private Chunk getRandomFillChunk()
     {
-        System.Random r = new System.Random();
-        Chunk c = chunkList[r.Next(0, chunkList.Count - 1)]; //Get random chunk to start
+        Chunk c = chunkList[random.Next(0, chunkList.Count)]; //Get random chunk to start
         while(c.entrance || c.exit) //Do until a chunk without an entrance or exit is found
         {
-            c = chunkList[r.Next(0, chunkList.Count - 1)]; //Pick at random until a good one is found
+            c = chunkList[random.Next(0, chunkList.Count)]; //Pick at random until a good one is found
         }
         return c;
     }

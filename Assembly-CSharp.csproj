@@ -73,8 +73,10 @@
     <None Include="Assets\Chunks\001101_ExitSpikePits.txt" />
     <None Include="Assets\Chunks\001100_ArrowtrapTunnel.txt" />
     <None Include="Assets\Chunks\101001_ExitMazeLike.txt" />
+    <None Include="Assets\Chunks\100000_Deathpit.txt" />
     <None Include="Assets\Chunks\101100_DropdownStepsArrowtrap.txt" />
     <None Include="Assets\Chunks\101100_SpikedDropdown.txt" />
+    <None Include="Assets\Chunks\000000_Deathbox 1.txt" />
     <None Include="Assets\Chunks\001100_SpikedTunnel.txt" />
     <None Include="Assets\Chunks\001100_Deathpit tunnel.txt" />
     <None Include="Assets\Chunks\110000_TallConnector.txt" />
@@ -84,10 +86,12 @@
     <None Include="Assets\Chunks\101100_dropdownWithSteps.txt" />
     <None Include="Assets\Chunks\100001_ExitPit.txt" />
     <None Include="Assets\Chunks\001001_ExitHard.txt" />
+    <None Include="Assets\Chunks\000000_Deathbox.txt" />
     <None Include="Assets\Chunks\101001_ExitDropdownAndArrowtrap.txt" />
     <None Include="Assets\Chunks\001010_EntranceTunnelLeft.txt" />
     <None Include="Assets\Chunks\001110_SpiralEntrance.txt" />
     <None Include="Assets\Chunks\001110_EntranceBump.txt" />
+    <None Include="Assets\Chunks\100000_Deathpit 1.txt" />
     <None Include="Assets\Chunks\001001_ExitSpikedArrowtrap.txt" />
     <None Include="Assets\Chunks\000101_ExitSpikeJump.txt" />
     <Reference Include="Unity.Timeline.Editor">
