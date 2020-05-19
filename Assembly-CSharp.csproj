@@ -63,10 +63,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\PlayerCharacter\PlayerInput.cs" />
-    <Compile Include="Assets\Scripts\Chunk.cs" />
-    <Compile Include="Assets\Scripts\Level.cs" />
-    <Compile Include="Assets\Scripts\LevelGenerator.cs" />
+    <Compile Include="Assets\Resources\PlayerCharacter\PlayerInput.cs" />
+    <Compile Include="Assets\Resources\Scripts\BombScript.cs" />
+    <Compile Include="Assets\Resources\Scripts\Chunk.cs" />
+    <Compile Include="Assets\Resources\Scripts\ExplosionScript.cs" />
+    <Compile Include="Assets\Resources\Scripts\Level.cs" />
+    <Compile Include="Assets\Resources\Scripts\LevelGenerator.cs" />
+    <Compile Include="Assets\Resources\Scripts\PickupScript.cs" />
+    <Compile Include="Assets\Resources\Scripts\ScoreCalc.cs" />
     <None Include="Assets\Chunks\001100_LeftRight.txt" />
     <None Include="Assets\Chunks\011110_EntranceLoss.txt" />
     <None Include="Assets\Chunks\000000_Filler3.txt" />
