@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -36,27 +37,50 @@ public class LevelGenerator : MonoBehaviour
          * 
          * */
 
+    //Refs to objects or components. 
     private Tilemap tilemap;
     private List<Chunk> chunkList = new List<Chunk>();
     private Chunk[,] chunkMatrix;
     private System.Random random;
+    private MusicRandomizer music;
 
     //Tiles
-    private TileBase rockTile;
-    private TileBase rockHardTile;
-    private TileBase entranceTile;
-    private TileBase exitTile;
-    private TileBase spikeTile;
-    private TileBase arrowtrapLeftTile;
-    private TileBase arrowtrapRightTile;
+    [SerializeField] private TileBase rockTile;
+    [SerializeField] private TileBase rockHardTile;
+    [SerializeField] private TileBase entranceTile;
+    [SerializeField] private TileBase exitTile;
 
-    private TileBase rockGoldTile;
-    private TileBase rockEmeraldTile;
-    private TileBase rockRubyTile;
-    private TileBase rockDiamondTile;
+    //Unused after turning these tiles into prefabs
+    //[SerializeField] private TileBase spikeTile;
+    //[SerializeField] private TileBase arrowTrapLeftTile;
+    //[SerializeField] private TileBase arrowTrapRightTile;
+
+    //Treasure rocks
+    [SerializeField] private TileBase rockGoldTile;
+    [SerializeField] private TileBase rockEmeraldTile;
+    [SerializeField] private TileBase rockRubyTile;
+    [SerializeField] private TileBase rockDiamondTile;
+
+    //Treasure items
+    [SerializeField] private GameObject treasureGold;
+    [SerializeField] private GameObject treasureEmerald;
+    [SerializeField] private GameObject treasureRuby;
+    [SerializeField] private GameObject treasureDiamond;
 
 
-    //Tile IDs
+    //Trap prefabs
+    [SerializeField] private GameObject arrowTrapLeft;
+    [SerializeField] private GameObject arrowTrapRight;
+    [SerializeField] private GameObject spikePrefab;
+
+    [SerializeField] private GameObject RedEnemy;
+    [SerializeField] private GameObject ShieldSkeleton;
+    [SerializeField] private GameObject SpearSkeleton;
+    [SerializeField] private GameObject SwordSkeleton;
+    [SerializeField] private GameObject Spider;
+
+
+    //Tile IDs - Used to load chunk files
     private static readonly int AIR            = 0;
     private static readonly int ROCK           = 1;
     private static readonly int SPIKES         = 2;
@@ -65,45 +89,95 @@ public class LevelGenerator : MonoBehaviour
     private static readonly int ENTRANCE       = 5;
     private static readonly int EXIT           = 6;
 
+    //Entrance coordinates
     private int entranceX;
     private int entranceY;
 
+    //Exit coordinates
+    private int exitX;
+    private int exitY;
+
+    //Var to count level the player is on.
+    private int levelcounter = 0;
+
     void Start()
     {
+        music = GameObject.FindGameObjectWithTag("MainCamera").GetComponentInChildren<MusicRandomizer>();
+        generateLevel();
+    }
 
+    //if(levelcounter == 0) { }
+
+    private void generateLevel()
+    {
         random = new System.Random();
 
-        //Get tilemap
-        tilemap = GetComponent<Tilemap>();
-
-        //Get the tiles, grabbing them from a place in the tilemap. Lazy, i know.
-        rockTile = tilemap.GetTile(new Vector3Int(-33,36,0));
-        rockHardTile = tilemap.GetTile(new Vector3Int(-32, 36, 0));
-        entranceTile = tilemap.GetTile(new Vector3Int(-30, 36, 0));
-        exitTile = tilemap.GetTile(new Vector3Int(-29, 36, 0));
-        spikeTile = tilemap.GetTile(new Vector3Int(-31, 36, 0));
-        arrowtrapLeftTile = tilemap.GetTile(new Vector3Int(-28, 36, 0));
-        arrowtrapRightTile = tilemap.GetTile(new Vector3Int(-27, 36, 0));
-
-        rockGoldTile = tilemap.GetTile(new Vector3Int(-33, 38, 0));
-        rockEmeraldTile = tilemap.GetTile(new Vector3Int(-33, 39, 0));
-        rockRubyTile = tilemap.GetTile(new Vector3Int(-33, 40, 0));
-        rockDiamondTile = tilemap.GetTile(new Vector3Int(-33, 41, 0));
-
-        //Place border of indestructible rock
-        for (int x = -1; x <= 40; x++)
+        if(levelcounter == 0)
         {
-            tilemap.SetTile(new Vector3Int(x, 1, 0), rockHardTile);  //Top wall
-            tilemap.SetTile(new Vector3Int(x, -40, 0), rockHardTile);//Bottom wall
+            //Get tilemap
+            tilemap = GetComponent<Tilemap>();
         }
-        for (int y = 1; y >= -40; y--)
+        
+
+        for (int x = 0; x < 40; x++)
         {
-            tilemap.SetTile(new Vector3Int(-1, y, 0), rockHardTile); //Left wall
-            tilemap.SetTile(new Vector3Int(40, y, 0), rockHardTile); //Right wall
+            for (int y = 0; y > -40; y--)
+            {
+                tilemap.SetTile(new Vector3Int(x, y, 0), null);
+            }
         }
 
-        //Load all chunks into memory from files.
-        readChunks();
+
+        if (levelcounter == 0) 
+        {
+            //Place border of indestructible rock
+            for (int x = -1; x <= 40; x++)
+            {
+                tilemap.SetTile(new Vector3Int(x, 1, 0), rockHardTile);  //Top wall
+                tilemap.SetTile(new Vector3Int(x, -40, 0), rockHardTile);//Bottom wall
+            }
+            for (int y = 1; y >= -40; y--)
+            {
+                tilemap.SetTile(new Vector3Int(-1, y, 0), rockHardTile); //Left wall
+                tilemap.SetTile(new Vector3Int(40, y, 0), rockHardTile); //Right wall
+            }
+
+            tilemap.FloodFill(new Vector3Int(-5, 5, 0), rockHardTile);
+
+            //Load all chunks into memory from files.
+            readChunks();
+        }
+   
+        if(levelcounter > 0)
+        {
+            //Remove all old arrowtraps and arrows when generating new level
+            GameObject[] arrowtraps = GameObject.FindGameObjectsWithTag("ArrowTrap");
+            foreach (GameObject obj in arrowtraps)
+            {
+                Destroy(obj);
+            }
+            GameObject[] arrows = GameObject.FindGameObjectsWithTag("Arrow");
+            foreach (GameObject obj in arrows)
+            {
+                Destroy(obj);
+            }
+            GameObject[] spikes = GameObject.FindGameObjectsWithTag("Spike");
+            foreach (GameObject obj in spikes)
+            {
+                Destroy(obj);
+            }
+            GameObject[] spiders = GameObject.FindGameObjectsWithTag("Spider");
+            foreach (GameObject obj in spiders)
+            {
+                Destroy(obj);
+            }
+            GameObject[] skels = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach (GameObject obj in skels)
+            {
+                Destroy(obj);
+            }
+        }
+        
 
         //Matrix for marking critical path. 
         bool[,] pathMatrix = new bool[4, 4];
@@ -116,11 +190,11 @@ public class LevelGenerator : MonoBehaviour
         }
 
         //Randomize the positions where the layers will connect, also force them to not be the same as the last one. 
-        int entrance_X = random.Next(0,4);
+        int entrance_X = random.Next(0, 4);
         int connectRow01_x = entrance_X;
-        while(connectRow01_x == entrance_X) { connectRow01_x = random.Next(0, 4); }
+        while (connectRow01_x == entrance_X) { connectRow01_x = random.Next(0, 4); }
         int connectRow12_x = random.Next(0, 4);
-        while(connectRow12_x == connectRow01_x) { connectRow12_x = random.Next(0, 4); }
+        while (connectRow12_x == connectRow01_x) { connectRow12_x = random.Next(0, 4); }
         int connectRow23_x = random.Next(0, 4);
         while (connectRow12_x == connectRow23_x) { connectRow23_x = random.Next(0, 4); }
         int exit_x = connectRow23_x;
@@ -143,19 +217,19 @@ public class LevelGenerator : MonoBehaviour
         pathMatrix[3, exit_x] = true;
 
         //Fill chunks between important pieces in pathMatrix
-        if((Math.Abs((entrance_X + 1) -(connectRow01_x + 1))) > 1) //Row 0
+        if ((Math.Abs((entrance_X + 1) - (connectRow01_x + 1))) > 1) //Row 0
         {
-            if(entrance_X > connectRow01_x)
+            if (entrance_X > connectRow01_x)
             {
                 int currentX = entrance_X;
-                while(currentX != connectRow01_x)
+                while (currentX != connectRow01_x)
                 {
                     currentX--;
                     pathMatrix[0, currentX] = true;
                 }
             }
             else
-            if(entrance_X < connectRow01_x)
+            if (entrance_X < connectRow01_x)
             {
                 int currentX = entrance_X;
                 while (currentX != connectRow01_x)
@@ -272,33 +346,33 @@ public class LevelGenerator : MonoBehaviour
 
         //Set entrance
         conn = checkSides(0, entrance_X, pathMatrix);
-        if(conn == LEFT ) { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, true, false, true, false); }
-        if(conn == RIGHT) { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, false, true, true, false); }
-        if(conn == BOTH)  { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, true, true, true, false); }
+        if (conn == LEFT) { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, true, false, true, false); }
+        if (conn == RIGHT) { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, false, true, true, false); }
+        if (conn == BOTH) { chunkMatrix[0, entrance_X] = getChunkWithRequirements(false, false, true, true, true, false); }
 
         //Set dropdown from row 0 to row 1
         conn = checkSides(0, connectRow01_x, pathMatrix);
-        if(conn == LEFT ) { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, true, false, false, false); }
-        if(conn == RIGHT) { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, false, true, false, false); }
-        if(conn == BOTH)  { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, true, true, false, false); }
+        if (conn == LEFT) { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, true, false, false, false); }
+        if (conn == RIGHT) { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, false, true, false, false); }
+        if (conn == BOTH) { chunkMatrix[0, connectRow01_x] = getChunkWithRequirements(false, true, true, true, false, false); }
 
         //Set drop from row 0 to row 1
         conn = checkSides(1, connectRow01_x, pathMatrix);
-        if(conn == LEFT ) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, true, false, false, false);}
-        if(conn == RIGHT) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, false, true, false, false);}
-        if(conn == BOTH) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, true, true, false, false); }
+        if (conn == LEFT) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, true, false, false, false); }
+        if (conn == RIGHT) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, false, true, false, false); }
+        if (conn == BOTH) { chunkMatrix[1, connectRow01_x] = getChunkWithRequirements(true, false, true, true, false, false); }
 
         //Set dropdown from row 1 from row 2
-        conn = checkSides(1,connectRow12_x,pathMatrix);
-        if(conn == LEFT ) { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, true, false, false, false);}
-        if(conn == RIGHT) { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, false, true, false, false);}
-        if(conn == BOTH)  { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, true, true, false, false); }
+        conn = checkSides(1, connectRow12_x, pathMatrix);
+        if (conn == LEFT) { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, true, false, false, false); }
+        if (conn == RIGHT) { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, false, true, false, false); }
+        if (conn == BOTH) { chunkMatrix[1, connectRow12_x] = getChunkWithRequirements(false, true, true, true, false, false); }
 
         //Set drop from row 1 to row 2
         conn = checkSides(2, connectRow12_x, pathMatrix);
-        if(conn == LEFT ) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, true, false, false, false);}
-        if(conn == RIGHT) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, false, true, false, false);}
-        if(conn == BOTH)  { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, true, true, false, false); }
+        if (conn == LEFT) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, true, false, false, false); }
+        if (conn == RIGHT) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, false, true, false, false); }
+        if (conn == BOTH) { chunkMatrix[2, connectRow12_x] = getChunkWithRequirements(true, false, true, true, false, false); }
 
         //Set dropdown from row 2 from row 3
         conn = checkSides(2, connectRow23_x, pathMatrix);
@@ -329,7 +403,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
         int entrancesCount = 0;
-        int exitsCount     = 0;
+        int exitsCount = 0;
 
         int gold = 0;
         int emerald = 0;
@@ -348,8 +422,8 @@ public class LevelGenerator : MonoBehaviour
                 {
                     for (int chunkCol = 0; chunkCol < 10; chunkCol++)
                     {
-                        int finalRow = (row*10) + chunkRow;
-                        int finalCol = (col*10) + chunkCol;
+                        int finalRow = (row * 10) + chunkRow;
+                        int finalCol = (col * 10) + chunkCol;
                         int tileVal = tileMatrix[chunkRow, chunkCol];
 
                         tilesPlaced[finalRow, finalCol] = true;
@@ -358,13 +432,44 @@ public class LevelGenerator : MonoBehaviour
                         {
                             case '0':
                                 tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), null); //Remove tile - set it as an "air" tile
+                               
+                                //if success on a 5% roll, spawn a random piece of treasure in the tile
+                                int randomval = random.Next(1, 101);
+                                if(randomval > 95)
+                                {
+                                     randomval = random.Next(0, 101);
+                                    if(randomval >= 50 && randomval < 75)
+                                    {
+                                        Instantiate(Spider, new Vector3Int(finalCol, -finalRow, 0), Quaternion.identity);
+                                    }
+                                    else
+                                    if (randomval >= 75 && randomval <= 85) //Place gold
+                                    {
+                                        Instantiate(treasureGold, new Vector3Int(finalCol, -finalRow, 0), Quaternion.identity);
+                                    }
+                                    else
+                                    if (randomval >= 90 && randomval <= 95) //Place emerald
+                                    {
+                                        Instantiate(treasureEmerald, new Vector3Int(finalCol, -finalRow, 0), Quaternion.identity);
+                                    }
+                                    else
+                                    if (randomval >= 96 && randomval <= 98) //Place ruby
+                                    {
+                                        Instantiate(treasureRuby, new Vector3Int(finalCol, -finalRow, 0), Quaternion.identity);
+                                    }
+                                    else
+                                    if (randomval >= 100 && randomval <= 100) //Place diamond
+                                    {
+                                        Instantiate(treasureDiamond, new Vector3Int(finalCol, -finalRow, 0), Quaternion.identity);
+                                    }
+                                }
                                 break;
                             case '1': //Rock (Or rock with treasure)
 
                                 //Roll for if the rock will contain treasure
                                 int val = random.Next(0, 101);
-                                
-                                if(val >= 75 && val <= 85) //Place gold
+
+                                if (val >= 75 && val <= 85) //Place gold
                                 {
                                     tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), rockGoldTile);
                                     gold++;
@@ -382,7 +487,7 @@ public class LevelGenerator : MonoBehaviour
                                     ruby++;
                                 }
                                 else
-                                if(val >= 100 && val <= 100) //Place diamond
+                                if (val >= 100 && val <= 100) //Place diamond
                                 {
                                     tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), rockDiamondTile);
                                     diamond++;
@@ -393,24 +498,28 @@ public class LevelGenerator : MonoBehaviour
                                 }
                                 break;
                             case '2': //Spikes
-                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),spikeTile);
+                                Instantiate(spikePrefab, new Vector3(finalCol - 0.48f, -finalRow - 1.17f), Quaternion.identity);
                                 break;
                             case '3': //ArrowtrapLeft
-                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),arrowtrapLeftTile);
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), null);
+                                Instantiate(arrowTrapLeft,new Vector3(finalCol-0.48f,-finalRow-1.17f),Quaternion.identity);
                                 break;
                             case '4': //ArrowtrapRight
-                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),arrowtrapRightTile);
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), null);
+                                Instantiate(arrowTrapRight, new Vector3(finalCol-0.48f, -finalRow-1.17f), Quaternion.identity);
                                 break;
                             case '5': //Entrance
-                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),entranceTile);
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), entranceTile);
                                 entranceX = finalCol;
                                 entranceY = -finalRow;
                                 GameObject playerCharacter = GameObject.FindWithTag("Player");
-                                playerCharacter.transform.position = new Vector3(entranceX-1, entranceY-1);
+                                playerCharacter.transform.position = new Vector3(entranceX - 1, entranceY - 1);
                                 entrancesCount++;
                                 break;
                             case '6': //Exit
-                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0),exitTile);
+                                tilemap.SetTile(new Vector3Int(finalCol, -finalRow, 0), exitTile);
+                                exitX = finalCol;
+                                exitY = -finalRow;
                                 exitsCount++;
                                 break;
                         }
@@ -419,17 +528,56 @@ public class LevelGenerator : MonoBehaviour
                 }
             }
         }
+        //Generate enemies, skiten fungerar inte alls xd
+        bool generateEnemies = true;
+        if(generateEnemies)
+        {
+            for (int row = 0; row < 40; row++)
+            {
+                for (int col = 0; col < 40; col++)
+                {
+                    if (tilemap.GetTile(new Vector3Int(row, -col, 0)) == null)
+                    {
+                        TileBase tileBelow = tilemap.GetTile(new Vector3Int(col, -row - 1, 0));
+                        TileBase tileBelowRight = tilemap.GetTile(new Vector3Int(col + 1, -row - 1, 0));
+                        TileBase tileBelowleft = tilemap.GetTile(new Vector3Int(col - 1, -row - 1, 0));
 
+                        Debug.Log("debug");
 
+                        if ((tileBelow != null && tileBelowleft != null && tileBelowRight != null) || true)
+                        {
+                            int val = random.Next(0, 101);
+                            if (val >= 95) // 5% to spawn enemy
+                            {
+                                val = random.Next(0, 101);
+                                bool spawnRed = (val >= 0 && val < 10) && false;
+                                bool spawnSpear = (val >= 10 && val < 20) && false;
+                                bool spawnShield = (val >= 20 && val < 45) && false;
+                                bool spawnSword = (val >= 45 && val < 70) && false;
+                                bool spawnSpider = (val >= 70 && val <= 100) && true;
+                                if (spawnRed) { Instantiate(RedEnemy, new Vector3Int(col, -row, 0), Quaternion.identity); }
+                                else
+                                if (spawnSpear) { Instantiate(SpearSkeleton, new Vector3Int(col, -row, 0), Quaternion.identity); }
+                                else
+                                if (spawnShield) { Instantiate(ShieldSkeleton, new Vector3Int(col, -row, 0), Quaternion.identity); }
+                                else
+                                if (spawnSword) { Instantiate(SwordSkeleton, new Vector3Int(col, -row, 0), Quaternion.identity); }
+                                else
+                                if (spawnSpider) { Instantiate(Spider, new Vector3Int(col, -row, 0), Quaternion.identity); }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         Debug.Log("Gold placed: " + gold);
         Debug.Log("Emeralds placed: " + emerald);
         Debug.Log("Rubies placed: " + ruby);
         Debug.Log("Diamonds placed: " + diamond);
 
-
-
         if (entrancesCount > 1) { Debug.LogError("Too many entrances! Placed " + entrancesCount); }
-        if(exitsCount > 1) { Debug.LogError("Too many exits! Placed " + exitsCount); }
+        if (exitsCount > 1) { Debug.LogError("Too many exits! Placed " + exitsCount); }
 
         int count = 0;
 
@@ -437,12 +585,12 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int col = 0; col < 40; col++)
             {
-                if(tilesPlaced[row, col]) { count++; }
+                if (tilesPlaced[row, col]) { count++; }
             }
         }
         Debug.Log("Tiles placed: " + count);
+        music.playSong();
     }
-
 
     private void readChunks()
     {
@@ -593,6 +741,40 @@ public class LevelGenerator : MonoBehaviour
         return retVal;
     }
 
+    public void CheckForExit(int x, int y)
+    {
+
+        if(x+1 == exitX && y+1 == exitY)
+        {
+            levelcounter++;
+            if (levelcounter < 4)
+            {
+                GameObject[] pickupList = GameObject.FindGameObjectsWithTag("ScorePickup");
+                foreach (GameObject i in pickupList)
+                {
+                    Destroy(i);
+                }
+                generateLevel();
+            }
+            else
+            {
+                //Win game.
+                GameObject go = GameObject.FindGameObjectWithTag("HUD"); //Remove hud
+                Destroy(go);
+
+                go = GameObject.FindGameObjectWithTag("WinScreen");
+                go.GetComponentInChildren<Canvas>().enabled = true;
+                Text[] texts = go.GetComponentsInChildren<Text>();
+                GameObject.FindGameObjectWithTag("MainCamera").GetComponentInChildren<MusicRandomizer>().stopSong();
+                go.GetComponentInChildren<AudioSource>().Play();
+
+                GameObject.FindGameObjectWithTag("Player").GetComponentInChildren<Player_Input>().setWon();
+            }
+
+        }
+
+
+    }
 
     // Update is called once per frame, never used
     void Update(){}

@@ -232,3 +232,4 @@ MonoBehaviour:
   ruby: {fileID: 555513254054666408, guid: 3a1fd2a8fc5db0e4399bfcaf443c4077, type: 3}
   emerald: {fileID: 1478375865404700724, guid: 07a341719abf4024c8a43cda23636b3d, type: 3}
   gold: {fileID: 6265365378945935340, guid: 122c7d37a52c76a4d9394e1eb2ec2274, type: 3}
+  debugTile: {fileID: 11400000, guid: d306876ca5853634b84af28767058ae0, type: 2}

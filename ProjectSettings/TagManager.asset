@@ -5,6 +5,20 @@ TagManager:
   serializedVersion: 2
   tags:
   - Tilemap
+  - ScorePickup
+  - HUD
+  - LifeText
+  - BombText
+  - MoneyText
+  - Arrow
+  - Tiles
+  - ArrowTrap
+  - Spike
+  - DeathHUD
+  - Bomb
+  - WinScreen
+  - Spider
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -17,10 +31,10 @@ TagManager:
   - Tiles
   - Explosion
   - Grid
-  - 
-  - 
-  - 
-  - 
+  - PlayerCharacter
+  - Spikes
+  - Player
+  - Damage
   - 
   - 
   - 

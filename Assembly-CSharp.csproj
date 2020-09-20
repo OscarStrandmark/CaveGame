@@ -63,14 +63,23 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Resources\PlayerCharacter\PlayerInput.cs" />
+    <Compile Include="Assets\Resources\Scripts\ArrowScript.cs" />
+    <Compile Include="Assets\Resources\Scripts\ArrowTrapLeft.cs" />
+    <Compile Include="Assets\Resources\Scripts\ArrowTrapRight.cs" />
     <Compile Include="Assets\Resources\Scripts\BombScript.cs" />
     <Compile Include="Assets\Resources\Scripts\Chunk.cs" />
     <Compile Include="Assets\Resources\Scripts\ExplosionScript.cs" />
-    <Compile Include="Assets\Resources\Scripts\Level.cs" />
     <Compile Include="Assets\Resources\Scripts\LevelGenerator.cs" />
+    <Compile Include="Assets\Resources\Scripts\MusicRandomizer.cs" />
     <Compile Include="Assets\Resources\Scripts\PickupScript.cs" />
+    <Compile Include="Assets\Resources\Scripts\Player_Health.cs" />
+    <Compile Include="Assets\Resources\Scripts\Player_Input.cs" />
+    <Compile Include="Assets\Resources\Scripts\Player_Inventory.cs" />
     <Compile Include="Assets\Resources\Scripts\ScoreCalc.cs" />
+    <Compile Include="Assets\Resources\Scripts\SkeletonController.cs" />
+    <Compile Include="Assets\Resources\Scripts\SpiderController.cs" />
+    <Compile Include="Assets\Resources\Scripts\SpikeScript.cs" />
+    <Compile Include="Assets\Resources\Scripts\StartInputReader.cs" />
     <None Include="Assets\Chunks\001100_LeftRight.txt" />
     <None Include="Assets\Chunks\011110_EntranceLoss.txt" />
     <None Include="Assets\Chunks\000000_Filler3.txt" />
